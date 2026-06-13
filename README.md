@@ -11,6 +11,7 @@ Hardware
 •	LEDs: PF11 (Red), PF12 (Blue)  
 •	User Button: PA0  
 •	Debug Pin: PE0  
+
 Features  
 •	TIM2: 1 Hz periodic interrupt (high priority)  
 •	TIM3: 2 Hz periodic interrupt (medium priority)  
@@ -25,11 +26,15 @@ Build Instructions
 4.	Upload: Run → Debug or Run
 
 Analysis  
-1.	Answer: The biggest delay for Task A is 21.006 ms. We measured this using the DWT cycle counter. We just checked the time when the TIM2 callback starts, and the time when the task_adc_ready part starts in the main loop. The difference between the two times is the delay, and the highest recorded was 21.006 ms. 
+
+1. What is the maximum latency for Task A in your system?  
+- 	The delay for Task A is 21.006 ms. This was measured using the DWT cycle counter by getting the time difference between the start of the TIM2 callback and when task_adc_ready started in the main loop. The highest value recorded is 21.006 ms. 
  
-2.	The biggest delay for Task A is 21.006 ms. We measured this using the DWT cycle counter. We just checked the time when the TIM2 callback starts, and the time when the task_adc_ready part starts in the main loop. The difference between the two times is the delay, and the highest recorded was 21.006 ms. 
+2. If Task B is running when TIM2 interrupt occurs, how does it affect TLatency(Task A)?  
+- 	If Task B is running, it will pause because TIM2 is more important (higher priority). The CPU will handle the TIM2 interrupt first before going back to Task B. Because of this, Task A can trigger faster, so its delay becomes shorter. 
  
-3.	To compute the worst-case response time when all tasks are running, just add the biggest delay of Task A and the time it takes to run. The max delay is 21.006 ms, and Task A needs 50 ms to finish. So, the worst-case response time is 71.006 ms. 
+3. Calculate worst-case TResponse for Task A if all other tasks are running  
+- 	To compute the worst-case response time, just add the biggest delay of Task A and its run time. The biggest delay measured is 21.006 ms, and Task A needs 50 ms to finish. So, the worst-case response time is 71.006 ms. 
  
-4.	If you use a preemptive scheduler, the response time of Task A will be faster, especially if it has a high priority. Once Task A is ready, it does not need to wait for the current task to finish. It can just interrupt a lower-priority task and run right away. This makes the delay much shorter and improves the response time. 
- 
+4. How would response time change with a preemptive scheduler?  
+If you use a preemptive scheduler, Task A will have a faster response time, especially if it has a higher priority. When Task A is ready, it does not need to wait for other tasks to finish. It can just interrupt a lower-priority task and run right away. This makes the delay much shorter. 
